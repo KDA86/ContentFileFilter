@@ -8,37 +8,39 @@ import java.util.List;
 import java.util.Scanner;
 
 public class FilterManager {
+
+    Calculator calculator = new Calculator();
+
     public void filterManager(boolean fullStatistic, String outPath, String prefix, List<String> fileName) throws ManagerSaveException, FileNotFoundException {
 
-        List<String> arrays = load(fileName);
+        List<String> arrays = loadFromFile(fileName);
         List<String> strings = new ArrayList<>();
-        List<String> integers = new ArrayList<>();
-        List<String> floats = new ArrayList<>();
+        List<Long> integers = new ArrayList<>();
+        List<Float> floats = new ArrayList<>();
 
         for (String array : arrays) {
             if (array.chars().allMatch(Character::isDigit)) {
-                integers.add(array);
+                integers.add(Long.valueOf(array));
             } else if (array.contains(".")) {
-                floats.add(array);
+                floats.add(Float.valueOf(array));
             } else {
                 strings.add(array);
             }
         }
-            if (!strings.isEmpty()) {
-                createAndSaveToStrings(outPath, prefix, strings);
-            }
-            if (!integers.isEmpty()) {
-                createAndSaveToIntegers(outPath, prefix, integers);
-            }
-            if (!floats.isEmpty()) {
-                createAndSaveToFloats(outPath, prefix, floats);
-            }
+        if (!strings.isEmpty()) {
+            createAndSaveToStrings(outPath, prefix, strings);
+        }
+        if (!integers.isEmpty()) {
+            createAndSaveToIntegers(outPath, prefix, integers);
+        }
+        if (!floats.isEmpty()) {
+            createAndSaveToFloats(outPath, prefix, floats);
+        }
         printStatistic(fullStatistic, strings, integers, floats);
     }
 
 
-
-    public List<String> load(List<String> fileName) throws FileNotFoundException {
+    public List<String> loadFromFile(List<String> fileName) throws FileNotFoundException {
         List<String> arrays = new ArrayList<>();
         for (String name : fileName) {
             File file = new File(".\\" + name);
@@ -70,11 +72,11 @@ public class FilterManager {
         }
     }
 
-    public void createAndSaveToFloats(String outPath, String prefix, List<String> floats) throws ManagerSaveException {
+    public void createAndSaveToFloats(String outPath, String prefix, List<Float> floats) throws ManagerSaveException {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + prefix + "floats.txt"))) {
-            for (String array : floats) {
-                bufferedWriter.write(array);
+            for (Float array : floats) {
+                bufferedWriter.write(array.toString());
                 bufferedWriter.newLine();
             }
         } catch (IOException e) {
@@ -82,11 +84,11 @@ public class FilterManager {
         }
     }
 
-    public void createAndSaveToIntegers(String outPath, String prefix, List<String> integers) throws ManagerSaveException {
+    public void createAndSaveToIntegers(String outPath, String prefix, List<Long> integers) throws ManagerSaveException {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + prefix + "integers.txt"))) {
-            for (String array : integers) {
-                bufferedWriter.write(array);
+            for (Long array : integers) {
+                bufferedWriter.write(array.toString());
                 bufferedWriter.newLine();
             }
         } catch (IOException e) {
@@ -94,23 +96,23 @@ public class FilterManager {
         }
     }
 
-    private void printStatistic(boolean fullStatistic, List<String> strings, List<String> integers, List<String> floats) {
+    private void printStatistic(boolean fullStatistic, List<String> strings, List<Long> integers, List<Float> floats) {
         if (fullStatistic) {
             System.out.println("Количество элементов в strings: " + strings.size());
-            System.out.println("Самая короткая строка: " + countingMinStringLength(strings) + " символа(ов)");
-            System.out.println("Самая длинная строка: " + countingMaxStringLength(strings) + " символа(ов)");
+            System.out.println("Самая короткая строка: " + calculator.countingMinStringLength(strings) + " символа(ов)");
+            System.out.println("Самая длинная строка: " + calculator.countingMaxStringLength(strings) + " символа(ов)");
 
             System.out.println("Количество элементов в integers: " + integers.size());
-            System.out.println("Миниальное значение в integers: " + countingMinValue(integers));
-            System.out.println("Максимальное значение в integers: " + countingMaxValue(integers));
-            System.out.println("Среднее значение в integers: " + countingMidValue(integers));
-            System.out.println("Сумма значений в integers: " + countingSumValue(integers));
+            System.out.println("Миниальное значение в integers: " + calculator.countingMinIntValue(integers));
+            System.out.println("Максимальное значение в integers: " + calculator.countingMaxIntValue(integers));
+            System.out.println("Среднее значение в integers: " + calculator.countingMidIntValue(integers));
+            System.out.println("Сумма значений в integers: " + calculator.countingSumIntValue(integers));
 
             System.out.println("Количество элементов в floats: " + floats.size());
-            System.out.println("Миниальное значение в floats: " + countingMinValue(floats));
-            System.out.println("Максимальное значение в floats: " + countingMaxValue(floats));
-            System.out.println("Среднее значение в floats: " + countingMidValue(floats));
-            System.out.println("Сумма значений в floats: " + countingSumValue(floats));
+            System.out.println("Миниальное значение в floats: " + calculator.countingMinFloatValue(floats));
+            System.out.println("Максимальное значение в floats: " + calculator.countingMaxFloatValue(floats));
+            System.out.println("Среднее значение в floats: " + calculator.countingMidFloatValue(floats));
+            System.out.println("Сумма значений в floats: " + calculator.countingSumFloatValue(floats));
         } else {
             System.out.println("Количество элементов в strings: " + strings.size());
             System.out.println("Количество элементов в integers: " + integers.size());
@@ -118,59 +120,5 @@ public class FilterManager {
         }
     }
 
-    public int countingMaxStringLength(List<String> strings){
-        int maxLength = 0;
-        for (String string: strings){
-            if(string.length() > maxLength){
-                maxLength = string.length();
-            }
-        }
-        return maxLength;
-    }
 
-    public int countingMinStringLength(List<String> strings){
-        int maxLength = 2;
-        for (String string: strings){
-            if(string.length() < maxLength){
-                maxLength = string.length();
-            }
-        }
-        return maxLength;
-    }
-
-    public double countingMinValue(List<String> values){
-        double minValue = Double.MAX_VALUE;
-        for (String value: values){
-            if(Double.parseDouble(value) < minValue){
-                minValue = Double.parseDouble(value);
-            }
-        }
-        return minValue;
-    }
-
-    public double countingMaxValue(List<String> values){
-        double maxValue = Double.MIN_VALUE;
-        for (String value: values){
-            if(Double.parseDouble(value) > maxValue){
-                maxValue = Double.parseDouble(value);
-            }
-        }
-        return maxValue;
-    }
-
-    public double countingMidValue(List<String> values){
-        double sumValue = 0.0f;
-        for (String value: values){
-            sumValue = sumValue + Double.parseDouble(value);
-            }
-        return sumValue / values.size();
-    }
-
-    public double countingSumValue(List<String> values){
-        double sumValue = 0.0f;
-        for (String value: values){
-            sumValue = sumValue + Double.parseDouble(value);
-        }
-        return sumValue;
-    }
 }
